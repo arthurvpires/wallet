@@ -5,6 +5,7 @@ namespace Tests\Feature\Controllers;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Transaction;
+use App\Enums\TransactionType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class WalletControllerTest extends TestCase
@@ -19,17 +20,17 @@ class WalletControllerTest extends TestCase
         parent::setUp();
 
         $this->user = User::factory()->create([
-            'balance' => 1000.00
+            'balance' => 1000
         ]);
 
         $this->recipient = User::factory()->create([
-            'balance' => 500.00
+            'balance' => 500
         ]);
     }
 
     public function test_deposit_endpoint()
     {
-        $amount = 100.00;
+        $amount = 100;
 
         $response = $this->actingAs($this->user)
             ->postJson('/wallet/deposit', [
@@ -40,12 +41,12 @@ class WalletControllerTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'balance' => 1100.00
+            'balance' => 1100
         ]);
 
         $this->assertDatabaseHas('transactions', [
             'user_id' => $this->user->id,
-            'type' => Transaction::TYPE_DEPOSIT,
+            'type' => TransactionType::DEPOSIT->value,
             'amount' => $amount
         ]);
     }
@@ -62,7 +63,7 @@ class WalletControllerTest extends TestCase
 
     public function test_transfer_endpoint()
     {
-        $amount = 100.00;
+        $amount = 100;
 
         $response = $this->actingAs($this->user)
             ->postJson('/wallet/transfer', [
@@ -74,24 +75,24 @@ class WalletControllerTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'balance' => 900.00
+            'balance' => 900
         ]);
 
         $this->assertDatabaseHas('users', [
             'id' => $this->recipient->id,
-            'balance' => 600.00
+            'balance' => 600
         ]);
 
         $this->assertDatabaseHas('transactions', [
             'user_id' => $this->user->id,
-            'type' => Transaction::TYPE_TRANSFER,
+            'type' => TransactionType::TRANSFER->value,
             'amount' => $amount,
             'recipient_id' => $this->recipient->id
         ]);
 
         $this->assertDatabaseHas('transactions', [
             'user_id' => $this->recipient->id,
-            'type' => Transaction::TYPE_RECEIVED_TRANSFER,
+            'type' => TransactionType::RECEIVED_TRANSFER->value,
             'amount' => $amount
         ]);
     }
@@ -101,7 +102,7 @@ class WalletControllerTest extends TestCase
         $response = $this->actingAs($this->user)
             ->postJson('/wallet/transfer', [
                 'recipient' => $this->recipient->email,
-                'amount' => 2000.00
+                'amount' => 2000
             ]);
 
         $response->assertStatus(500)
@@ -115,7 +116,7 @@ class WalletControllerTest extends TestCase
         $response = $this->actingAs($this->user)
             ->postJson('/wallet/transfer', [
                 'recipient' => 'nonexistent@example.com',
-                'amount' => 100.00
+                'amount' => 100
             ]);
 
         $response->assertStatus(422);
@@ -125,14 +126,14 @@ class WalletControllerTest extends TestCase
     {
         Transaction::factory()->create([
             'user_id' => $this->user->id,
-            'type' => Transaction::TYPE_DEPOSIT,
-            'amount' => 100.00
+            'type' => TransactionType::DEPOSIT->value,
+            'amount' => 100
         ]);
 
         Transaction::factory()->create([
             'user_id' => $this->user->id,
-            'type' => Transaction::TYPE_TRANSFER,
-            'amount' => 50.00,
+            'type' => TransactionType::TRANSFER->value,
+            'amount' => 50,
             'recipient_id' => $this->recipient->id
         ]);
 
@@ -157,13 +158,13 @@ class WalletControllerTest extends TestCase
     {
         $transaction = Transaction::factory()->create([
             'user_id' => $this->user->id,
-            'type' => Transaction::TYPE_TRANSFER,
-            'amount' => 100.00,
+            'type' => TransactionType::TRANSFER->value,
+            'amount' => 100,
             'recipient_id' => $this->recipient->id
         ]);
 
-        $this->user->update(['balance' => 900.00]);
-        $this->recipient->update(['balance' => 600.00]);
+        $this->user->update(['balance' => 900]);
+        $this->recipient->update(['balance' => 600]);
 
         $response = $this->actingAs($this->user)
             ->postJson('/wallet/revert', [
@@ -174,12 +175,12 @@ class WalletControllerTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'balance' => 1000.00
+            'balance' => 1000
         ]);
 
         $this->assertDatabaseHas('users', [
             'id' => $this->recipient->id,
-            'balance' => 500.00
+            'balance' => 500
         ]);
 
         $this->assertDatabaseHas('transactions', [
@@ -192,8 +193,8 @@ class WalletControllerTest extends TestCase
     {
         $transaction = Transaction::factory()->create([
             'user_id' => $this->user->id,
-            'type' => Transaction::TYPE_TRANSFER,
-            'amount' => 100.00,
+            'type' => TransactionType::TRANSFER->value,
+            'amount' => 100,
             'recipient_id' => $this->recipient->id,
             'was_reverted' => true
         ]);

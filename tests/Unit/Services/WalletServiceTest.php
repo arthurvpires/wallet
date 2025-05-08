@@ -2,14 +2,15 @@
 
 namespace Tests\Unit\Services;
 
+use Mockery;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Transaction;
+use App\Enums\TransactionType;
 use App\Services\WalletService;
 use App\Repositories\UserRepository;
-use App\Repositories\TransactionRepository;
 use Illuminate\Support\Facades\Auth;
-use Mockery;
+use App\Repositories\TransactionRepository;
 
 class WalletServiceTest extends TestCase
 {
@@ -36,14 +37,14 @@ class WalletServiceTest extends TestCase
 
     public function test_deposit_with_valid_amount()
     {
-        $amount = 100.00;
+        $amount = 100;
         $this->authUser->shouldReceive('getAttribute')->with('id')->andReturn(1);
 
         $this->transactionRepo->shouldReceive('create')
             ->once()
             ->andReturn(new Transaction());
 
-        $this->userRepo->shouldReceive(Transaction::TYPE_DEPOSIT)
+        $this->userRepo->shouldReceive(TransactionType::DEPOSIT->value)
             ->once()
             ->with($this->authUser, $amount)
             ->andReturn($amount);
@@ -62,7 +63,7 @@ class WalletServiceTest extends TestCase
 
     public function test_transfer_with_valid_data()
     {
-        $amount = 100.00;
+        $amount = 100;
         $recipientEmail = 'recipient@example.com';
         $recipient = Mockery::mock(User::class);
 
@@ -88,7 +89,7 @@ class WalletServiceTest extends TestCase
             ->twice()
             ->andReturn(new Transaction());
 
-        $this->userRepo->shouldReceive(Transaction::TYPE_TRANSFER)
+        $this->userRepo->shouldReceive(TransactionType::TRANSFER->value)
             ->once()
             ->with($this->authUser, $recipient, $amount)
             ->andReturn($amount);
