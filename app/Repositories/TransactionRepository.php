@@ -62,7 +62,7 @@ class TransactionRepository
 
             DB::commit();
 
-            return $sender->balance / 100;
+            return $sender->balance;
 
         } catch (Exception $e) {
             DB::rollBack();
