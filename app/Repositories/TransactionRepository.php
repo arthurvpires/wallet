@@ -5,6 +5,7 @@ namespace App\Repositories;
 use Exception;
 use App\Models\User;
 use App\Models\Transaction;
+use App\Enums\TransactionType;
 use Illuminate\Support\Facades\DB;
 
 class TransactionRepository
@@ -22,7 +23,7 @@ class TransactionRepository
             ->map(fn ($transaction) => [
                 'id' => $transaction->id,
                 'user_id' => $transaction->id,
-                'type' => $transaction->type,
+                'type' => $transaction->type->value,
                 'amount' => $transaction->amount,
                 'recipient_email' => $transaction->recipient?->email ?? '' ,
                 'created_at' => $transaction->created_at,
@@ -36,7 +37,7 @@ class TransactionRepository
         return Transaction::find($id);
     }
 
-    public function revert(Transaction $transaction): float
+    public function revert(Transaction $transaction): int
     {
         $sender = $transaction->user;
         $recipient = $transaction->recipient;
@@ -44,8 +45,7 @@ class TransactionRepository
 
         try {
             DB::beginTransaction();
-
-            if ($transaction->type === Transaction::TYPE_DEPOSIT) {
+            if ($transaction->type->value === TransactionType::DEPOSIT->value) {
                 $sender->decrement('balance', $amount);
             } else {
                 $sender->increment('balance', $amount);
@@ -66,10 +66,10 @@ class TransactionRepository
         }
     }
 
-    private function findReceivedTransfer(User $recipient, float $amount, string $createdAt): ?Transaction
+    private function findReceivedTransfer(User $recipient, int $amount, string $createdAt): ?Transaction
     {
         $recipientTransaction = Transaction::where('user_id', $recipient->id)
-            ->where('type', Transaction::TYPE_RECEIVED_TRANSFER)
+            ->where('type', TransactionType::RECEIVED_TRANSFER->value)
             ->where('amount', $amount)
             ->where('created_at', $createdAt)
             ->first();

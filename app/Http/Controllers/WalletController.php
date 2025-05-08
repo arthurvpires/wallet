@@ -16,17 +16,17 @@ class WalletController extends Controller
         $this->walletService = $walletService;
     }
 
-    public function deposit(DepositRequest $request): float
+    public function deposit(DepositRequest $request): int
     {
         return $this->walletService->deposit($request->amount());
     }
 
-    public function transfer(TransferRequest $request): float
+    public function transfer(TransferRequest $request): int
     {
         return $this->walletService->transfer($request->recipient(), $request->amount());
     }
 
-    public function revert(RevertRequest $request): float
+    public function revert(RevertRequest $request): int
     {
         return $this->walletService->revert($request->transactionId());
     }

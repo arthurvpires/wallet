@@ -8,7 +8,7 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->decimal('balance', 15, 2)->default(0.00);
+            $table->integer('balance')->default(0);
         });
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TransactionType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,10 +10,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Transaction extends Model
 {
     use HasFactory;
-
-    public const TYPE_DEPOSIT = 'deposit';
-    public const TYPE_TRANSFER = 'transfer';
-    public const TYPE_RECEIVED_TRANSFER = 'received_transfer';
 
     public $timestamps = true;
     protected $fillable = [
@@ -24,7 +21,8 @@ class Transaction extends Model
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
+        'amount' => 'integer',
+        'type' => TransactionType::class,
     ];
 
     public function user(): BelongsTo

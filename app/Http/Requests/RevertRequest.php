@@ -26,6 +26,4 @@ class RevertRequest extends FormRequest
     {
         return (int) $this->validated('transaction_id');
     }
-
-
 }

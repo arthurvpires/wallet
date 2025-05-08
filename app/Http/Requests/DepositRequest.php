@@ -23,8 +23,8 @@ class DepositRequest extends FormRequest
         ];
     }
 
-    public function amount(): float
+    public function amount(): int
     {
-        return (float) $this->validated('amount');
+        return (int) $this->validated('amount');
     }
 }

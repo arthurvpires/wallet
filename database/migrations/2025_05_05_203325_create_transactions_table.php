@@ -11,7 +11,7 @@ return new class () extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('type');
-            $table->decimal('amount', 15, 2);
+            $table->integer('amount')->default(0);
             $table->foreignId('recipient_id')->nullable()->constrained('users')->onDelete('set null');
             $table->boolean('was_reverted')->default(false);
             $table->timestamps();

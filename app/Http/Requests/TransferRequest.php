@@ -9,7 +9,7 @@ class TransferRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => ['required', 'numeric', 'min:0.01','regex:/^\d*\.?\d+$/'],
+            'amount' => ['required', 'integer', 'min:1'],
             'recipient' => ['required', 'email', 'exists:users,email'],
         ];
     }
@@ -18,20 +18,18 @@ class TransferRequest extends FormRequest
     {
         return [
             'amount.required' => 'O campo valor é obrigatório.',
-            'amount.numeric' => 'O valor deve ser um número.',
+            'amount.integer' => 'O valor deve ser um número inteiro.',
             'amount.min' => 'O valor deve ser maior que zero.',
-            'amount.regex' => 'O valor deve ser um número positivo.',
             'recipient.required' => 'O campo destinatário é obrigatório.',
             'recipient.email' => 'O destinatário deve ser um email válido.',
             'recipient.exists' => 'O email informado não está registrado.',
         ];
     }
 
-    public function amount(): float
+    public function amount(): int
     {
-        return (float) $this->validated('amount');
+        return (int) $this->validated('amount');
     }
-
 
     public function recipient(): string
     {

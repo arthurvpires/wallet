@@ -17,7 +17,7 @@ class UserRepository
         return User::find($id);
     }
 
-    public function transfer(User $sender, User $recipient, float $amount): float
+    public function transfer(User $sender, User $recipient, int $amount): int
     {
         try {
             DB::beginTransaction();
@@ -34,7 +34,7 @@ class UserRepository
         }
     }
 
-    public function deposit(User $user, float $amount): float
+    public function deposit(User $user, int $amount): int
     {
         try {
             DB::beginTransaction();
@@ -48,7 +48,6 @@ class UserRepository
             DB::rollBack();
             throw $e;
         }
-
 
         return $user->balance;
     }
