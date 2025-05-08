@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wallet-challange
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    networks:
+      - wallet-challange-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: wallet-challange_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - wallet-challange-network
+
+  db:
+    image: mysql:8.0
+    container_name: wallet-challange_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: wallet-challange_db
+      MYSQL_ROOT_PASSWORD: root_secret
+      MYSQL_USER: wallet-challange_user
+      MYSQL_PASSWORD: root_secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - wallet-challange-network
+
+networks:
+  wallet-challange-network:
+    driver: bridge
+
+volumes:
+  dbdata:
