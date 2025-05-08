@@ -21,13 +21,13 @@ class WalletServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->userRepo = Mockery::mock(UserRepository::class);
         $this->transactionRepo = Mockery::mock(TransactionRepository::class);
         $this->authUser = Mockery::mock(User::class);
-        
+
         Auth::shouldReceive('user')->andReturn($this->authUser);
-        
+
         $this->walletService = new WalletService(
             $this->userRepo,
             $this->transactionRepo
@@ -38,11 +38,11 @@ class WalletServiceTest extends TestCase
     {
         $amount = 100.00;
         $this->authUser->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        
+
         $this->transactionRepo->shouldReceive('create')
             ->once()
             ->andReturn(new Transaction());
-            
+
         $this->userRepo->shouldReceive(Transaction::TYPE_DEPOSIT)
             ->once()
             ->with($this->authUser, $amount)
@@ -56,7 +56,7 @@ class WalletServiceTest extends TestCase
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('O valor do depósito deve ser maior que zero.');
-        
+
         $this->walletService->deposit(0);
     }
 
@@ -65,7 +65,7 @@ class WalletServiceTest extends TestCase
         $amount = 100.00;
         $recipientEmail = 'recipient@example.com';
         $recipient = Mockery::mock(User::class);
-        
+
         $this->authUser->shouldReceive('getAttribute')
             ->with('email')
             ->andReturn('sender@example.com');
@@ -75,19 +75,19 @@ class WalletServiceTest extends TestCase
         $this->authUser->shouldReceive('getAttribute')
             ->with('id')
             ->andReturn(1);
-            
+
         $recipient->shouldReceive('getAttribute')
             ->with('id')
             ->andReturn(2);
-            
+
         $this->userRepo->shouldReceive('findByEmail')
             ->with($recipientEmail)
             ->andReturn($recipient);
-            
+
         $this->transactionRepo->shouldReceive('create')
             ->twice()
             ->andReturn(new Transaction());
-            
+
         $this->userRepo->shouldReceive(Transaction::TYPE_TRANSFER)
             ->once()
             ->with($this->authUser, $recipient, $amount)
@@ -101,14 +101,14 @@ class WalletServiceTest extends TestCase
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Saldo insuficiente para transferência.');
-        
+
         $this->authUser->shouldReceive('getAttribute')
             ->with('email')
             ->andReturn('sender@example.com');
         $this->authUser->shouldReceive('getAttribute')
             ->with('balance')
             ->andReturn(50.00);
-            
+
         $this->walletService->transfer('recipient@example.com', 100.00);
     }
 
@@ -116,18 +116,18 @@ class WalletServiceTest extends TestCase
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Você não pode transferir para si mesmo.');
-        
+
         $this->authUser->shouldReceive('getAttribute')
             ->with('email')
             ->andReturn('user@example.com');
-            
+
         $this->walletService->transfer('user@example.com', 100.00);
     }
 
     public function test_show_transactions_history()
     {
         $expectedHistory = ['transaction1', 'transaction2'];
-        
+
         $this->transactionRepo->shouldReceive('getTransactionHistory')
             ->once()
             ->with($this->authUser)
@@ -142,11 +142,11 @@ class WalletServiceTest extends TestCase
         $transactionId = 1;
         $transaction = Mockery::mock(Transaction::class);
         $user = Mockery::mock(User::class);
-        
+
         $this->transactionRepo->shouldReceive('findById')
             ->with($transactionId)
             ->andReturn($transaction);
-            
+
         $transaction->shouldReceive('getAttribute')
             ->with('was_reverted')
             ->andReturn(false);
@@ -156,15 +156,15 @@ class WalletServiceTest extends TestCase
         $transaction->shouldReceive('getAttribute')
             ->with('amount')
             ->andReturn(100.00);
-            
+
         $user->shouldReceive('getAttribute')
             ->with('balance')
             ->andReturn(200.00);
-            
+
         $this->userRepo->shouldReceive('findById')
             ->with(1)
             ->andReturn($user);
-            
+
         $this->transactionRepo->shouldReceive('revert')
             ->once()
             ->with($transaction)
@@ -179,4 +179,4 @@ class WalletServiceTest extends TestCase
         Mockery::close();
         parent::tearDown();
     }
-} 
+}

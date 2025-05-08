@@ -17,11 +17,11 @@ class WalletControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->user = User::factory()->create([
             'balance' => 1000.00
         ]);
-        
+
         $this->recipient = User::factory()->create([
             'balance' => 500.00
         ]);
@@ -30,7 +30,7 @@ class WalletControllerTest extends TestCase
     public function test_deposit_endpoint()
     {
         $amount = 100.00;
-        
+
         $response = $this->actingAs($this->user)
             ->postJson('/wallet/deposit', [
                 'amount' => $amount
@@ -63,7 +63,7 @@ class WalletControllerTest extends TestCase
     public function test_transfer_endpoint()
     {
         $amount = 100.00;
-        
+
         $response = $this->actingAs($this->user)
             ->postJson('/wallet/transfer', [
                 'recipient' => $this->recipient->email,
@@ -216,4 +216,4 @@ class WalletControllerTest extends TestCase
 
         $response->assertStatus(422);
     }
-} 
+}

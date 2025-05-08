@@ -6,7 +6,6 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class TransferRequest extends FormRequest
 {
-
     public function rules(): array
     {
         return [
@@ -33,7 +32,7 @@ class TransferRequest extends FormRequest
         return (float) $this->validated('amount');
     }
 
-    
+
     public function recipient(): string
     {
         return (string) $this->validated('recipient');

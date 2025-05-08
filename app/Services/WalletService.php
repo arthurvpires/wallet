@@ -102,9 +102,9 @@ class WalletService
             //Create transaction for recipient
             return $this->transactionRepo->create([
                 'user_id' => $recipientId,
-                'type' => Transaction::TYPE_RECEIVED_TRANSFER, 
+                'type' => Transaction::TYPE_RECEIVED_TRANSFER,
                 'amount' => $amount,
-                'recipient_id' => $userId, 
+                'recipient_id' => $userId,
             ]);
         }
 

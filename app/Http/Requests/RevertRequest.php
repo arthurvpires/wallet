@@ -6,7 +6,6 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class RevertRequest extends FormRequest
 {
-
     public function rules(): array
     {
         return [

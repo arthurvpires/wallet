@@ -19,7 +19,7 @@ class TransactionRepository
         return Transaction::where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(fn($transaction) => [
+            ->map(fn ($transaction) => [
                 'id' => $transaction->id,
                 'user_id' => $transaction->id,
                 'type' => $transaction->type,
@@ -82,4 +82,3 @@ class TransactionRepository
         return $recipientTransaction;
     }
 }
-
