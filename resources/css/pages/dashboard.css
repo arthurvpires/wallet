@@ -1,0 +1,44 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.circular-progress {
+    transform: rotate(-90deg);
+}
+
+.progress-foreground {
+    animation: fill 2s linear forwards;
+}
+
+@keyframes fill {
+    from {
+        stroke-dashoffset: 87.964;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th,
+td {
+    text-align: left;
+    font-size: 0.875rem;
+}
+
+tbody tr:hover {
+    background-color: #f9fafb;
+} 

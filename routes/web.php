@@ -1,9 +1,11 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
+use App\Http\Controllers\WalletController;
+use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -15,7 +17,11 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    return Inertia::render('Dashboard', [
+        'user' => Auth::user(),
+        'balance' => Auth::user()->balance,
+        'name' => Auth::user()->name,
+    ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -24,4 +30,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::middleware('auth')->group(function () {
+    Route::post('/wallet/deposit', [WalletController::class, 'deposit']);
+    Route::post('/wallet/transfer', [WalletController::class, 'transfer']);
+    Route::post('/wallet/revert', [WalletController::class, 'revert']);
+    Route::get('/wallet/history', [WalletController::class, 'history']);
+});
 require __DIR__.'/auth.php';
