@@ -23,7 +23,10 @@ export default {
     },
     computed: {
         formattedBalance() {
-            return parseFloat(this.localBalance || 0).toFixed(2).replace('.', ',');
+            return parseFloat(this.localBalance).toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
         }
     },
     async created() {
@@ -53,12 +56,12 @@ export default {
                 let response;
                 if (this.modalType === 'deposit') {
                     response = await axios.post('/wallet/deposit', {
-                        amount: parseFloat(this.form.amount)
+                        amount: parseInt(this.form.amount)
                     });
                     this.successMessage = 'Depósito feito com sucesso!';
                 } else {
                     response = await axios.post('/wallet/transfer', {
-                        amount: parseFloat(this.form.amount),
+                        amount: parseInt(this.form.amount),
                         recipient: this.form.recipient
                     });
                     this.successMessage = 'Transferência feita com sucesso!';
@@ -102,7 +105,10 @@ export default {
         },
 
         formatAmount(amount) {
-            return parseFloat(amount).toFixed(2).replace('.', ',');
+            return parseFloat(amount).toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
         },
         
         formatDate(date) {
