@@ -17,7 +17,7 @@ class TransactionFactory extends Factory
             'type' => $this->faker->randomElement([Transaction::TYPE_DEPOSIT, Transaction::TYPE_TRANSFER, Transaction::TYPE_RECEIVED_TRANSFER]),
             'amount' => $this->faker->randomFloat(2, 1, 1000),
             'recipient_id' => User::factory(),
-            'was_reverted' => $this->faker->boolean,
+            'was_reverted' => false,
         ];
     }
 }

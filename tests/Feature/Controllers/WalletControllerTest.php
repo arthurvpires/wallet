@@ -5,7 +5,6 @@ namespace Tests\Feature\Controllers;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Transaction;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class WalletControllerTest extends TestCase
@@ -187,6 +186,25 @@ class WalletControllerTest extends TestCase
             'id' => $transaction->id,
             'was_reverted' => true
         ]);
+    }
+
+    public function test_transaction_already_reverted()
+    {
+        $transaction = Transaction::factory()->create([
+            'user_id' => $this->user->id,
+            'type' => Transaction::TYPE_TRANSFER,
+            'amount' => 100.00,
+            'recipient_id' => $this->recipient->id,
+            'was_reverted' => true
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->postJson('/wallet/revert', [
+                'transaction_id' => $transaction->id,
+                'message' => 'Esta transação já foi revertida.'
+            ]);
+
+        $response->assertStatus(500);
     }
 
     public function test_revert_nonexistent_transaction()
