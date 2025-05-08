@@ -25,19 +25,19 @@ class WalletService
         $this->authUser = Auth::user();
     }
 
-    public function deposit(int $amount): int
+    public function deposit(float $amount): float
     {
-        if ($amount <= 0) {
+        if ($amount <= 0.01) {
             throw new DepositException('O valor do depósito deve ser maior que zero.');
         }
 
         $deposit = $this->userRepo->deposit($this->authUser, $amount);
-        $this->createTransaction($this->authUser->id, TransactionType::DEPOSIT->value, $amount, null);
+        $this->createTransaction($this->authUser->id, TransactionType::DEPOSIT, $amount, null);
 
         return $deposit;
     }
 
-    public function transfer(string $recipientEmail, int $amount): int
+    public function transfer(string $recipientEmail, float $amount): float
     {
         if ($amount <= 0) {
             throw new TransferException('O valor da transferência deve ser maior que zero.');
@@ -57,12 +57,12 @@ class WalletService
             throw new TransferException('Destinatário não encontrado.');
         }
         $transfer = $this->userRepo->transfer($this->authUser, $recipient, $amount);
-        $this->createTransaction($this->authUser->id, TransactionType::TRANSFER->value, $amount, $recipient->id);
+        $this->createTransaction($this->authUser->id, TransactionType::TRANSFER, $amount, $recipient->id);
 
         return $transfer;
     }
 
-    public function revert(int $transactionId): int
+    public function revert(int $transactionId): float
     {
         $transaction = $this->transactionRepo->findById($transactionId);
         $recipient = $this->userRepo->findById($transaction->user_id);
@@ -87,7 +87,7 @@ class WalletService
         return $this->transactionRepo->getTransactionHistory($this->authUser);
     }
 
-    private function createTransaction(int $userId, string $type, int $amount, ?int $recipientId): Transaction
+    private function createTransaction(int $userId, TransactionType $type, float $amount, ?int $recipientId): Transaction
     {
         $baseTransaction = [
             'user_id' => $userId,
@@ -96,7 +96,7 @@ class WalletService
             'recipient_id' => $recipientId,
         ];
 
-        if ($type === TransactionType::TRANSFER->value) {
+        if ($type === TransactionType::TRANSFER) {
             $this->transactionRepo->create($baseTransaction);
 
             //Create transaction for recipient

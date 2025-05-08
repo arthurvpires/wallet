@@ -12,6 +12,10 @@ class TransactionRepository
 {
     public function create(array $fields): Transaction
     {
+        if (isset($fields['amount'])) {
+            $fields['amount'] = (int) round($fields['amount'] * 100);
+        }
+
         return Transaction::create($fields);
     }
 
@@ -24,7 +28,7 @@ class TransactionRepository
                 'id' => $transaction->id,
                 'user_id' => $transaction->id,
                 'type' => $transaction->type->value,
-                'amount' => $transaction->amount,
+                'amount' => $transaction->amount / 100,
                 'recipient_email' => $transaction->recipient?->email ?? '' ,
                 'created_at' => $transaction->created_at,
                 'was_reverted' => $transaction->was_reverted,
@@ -37,7 +41,7 @@ class TransactionRepository
         return Transaction::find($id);
     }
 
-    public function revert(Transaction $transaction): int
+    public function revert(Transaction $transaction): float
     {
         $sender = $transaction->user;
         $recipient = $transaction->recipient;
@@ -58,7 +62,7 @@ class TransactionRepository
 
             DB::commit();
 
-            return $sender->balance;
+            return $sender->balance / 100;
 
         } catch (Exception $e) {
             DB::rollBack();

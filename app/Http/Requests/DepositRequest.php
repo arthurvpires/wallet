@@ -9,7 +9,7 @@ class DepositRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => ['required', 'numeric', 'min:0.01', 'regex:/^\d*\.?\d+$/'],
+            'amount' => ['required', 'numeric', 'min:0.01'],
         ];
     }
 
@@ -19,12 +19,11 @@ class DepositRequest extends FormRequest
             'amount.required' => 'O campo valor é obrigatório.',
             'amount.numeric' => 'O valor deve ser um número.',
             'amount.min' => 'O valor deve ser maior que zero.',
-            'amount.regex' => 'O valor deve ser um número positivo.',
         ];
     }
 
-    public function amount(): int
+    public function amount(): float
     {
-        return (int) $this->validated('amount');
+        return (float) $this->validated('amount');
     }
 }

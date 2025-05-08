@@ -17,38 +17,38 @@ class UserRepository
         return User::find($id);
     }
 
-    public function transfer(User $sender, User $recipient, int $amount): int
+    public function transfer(User $sender, User $recipient, float $amount): float
     {
         try {
             DB::beginTransaction();
 
-            $sender->decrement('balance', $amount);
-            $recipient->increment('balance', $amount);
+            $amountInCents = (int) round($amount * 100);
+            $sender->decrement('balance', $amountInCents);
+            $recipient->increment('balance', $amountInCents);
 
             DB::commit();
 
-            return $sender->balance;
+            return $sender->balance / 100;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
         }
     }
 
-    public function deposit(User $user, int $amount): int
+    public function deposit(User $user, float $amount): float
     {
         try {
             DB::beginTransaction();
-            $user->balance += $amount;
+            $amountInCents = (int) round($amount * 100);
+            $user->balance += $amountInCents;
             $user->save();
 
             DB::commit();
 
-            return $user->balance;
+            return $user->balance / 100;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
         }
-
-        return $user->balance;
     }
 }
