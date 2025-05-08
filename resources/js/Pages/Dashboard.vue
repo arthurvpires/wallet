@@ -10,7 +10,7 @@
         </div>
     </nav>
 
-    <div class="bg-gray-100 min-h-screen p-4 pt-20 w-full flex flex-col items-center overflow-auto">
+    <div class="bg-gray-100 max-h-screen p-4 pt-20 w-full flex flex-col items-center overflow-auto">
         <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg mb-6">
             <h1 class="text-2xl font-semibold text-gray-800 mb-4">
                 {{ `Olá, ${name}!` }}

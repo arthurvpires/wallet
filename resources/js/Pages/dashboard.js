@@ -23,12 +23,13 @@ export default {
     },
     computed: {
         formattedBalance() {
-            return parseFloat(this.localBalance).toLocaleString('pt-BR', {
+            return (parseFloat(this.localBalance) / 100).toLocaleString('pt-BR', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
         }
     },
+
     async created() {
         await this.fetchTransactions();
     },
@@ -56,17 +57,17 @@ export default {
                 let response;
                 if (this.modalType === 'deposit') {
                     response = await axios.post('/wallet/deposit', {
-                        amount: parseInt(this.form.amount)
+                        amount: parseFloat(this.form.amount)
                     });
                     this.successMessage = 'Depósito feito com sucesso!';
                 } else {
                     response = await axios.post('/wallet/transfer', {
-                        amount: parseInt(this.form.amount),
+                        amount: this.form.amount,
                         recipient: this.form.recipient
                     });
                     this.successMessage = 'Transferência feita com sucesso!';
                 }
-                this.localBalance = response.data.toString();
+                this.localBalance = (response.data * 100).toString();
                 this.closeModal();
                 this.successTimeout = setTimeout(() => {
                     this.successMessage = '';
@@ -105,12 +106,12 @@ export default {
         },
 
         formatAmount(amount) {
-            return parseFloat(amount).toLocaleString('pt-BR', {
+            return (parseFloat(amount)).toLocaleString('pt-BR', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
         },
-        
+
         formatDate(date) {
             return new Date(date).toLocaleString('pt-BR', {
                 day: '2-digit',
@@ -120,7 +121,7 @@ export default {
                 minute: '2-digit'
             });
         },
-        
+
         async logout() {
             try {
                 await axios.post('/logout', {}, {
