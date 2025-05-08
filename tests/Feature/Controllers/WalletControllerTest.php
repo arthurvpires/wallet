@@ -30,7 +30,8 @@ class WalletControllerTest extends TestCase
 
     public function test_deposit_endpoint()
     {
-        $amount = 100;
+        $amount = 1.50;
+        $amountInCents = (int) round($amount * 100);
 
         $response = $this->actingAs($this->user)
             ->postJson('/wallet/deposit', [
@@ -41,15 +42,16 @@ class WalletControllerTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'balance' => 1100
+            'balance' => 1000 + $amountInCents
         ]);
 
         $this->assertDatabaseHas('transactions', [
             'user_id' => $this->user->id,
             'type' => TransactionType::DEPOSIT->value,
-            'amount' => $amount
+            'amount' => $amountInCents
         ]);
     }
+
 
     public function test_deposit_with_invalid_amount()
     {
@@ -63,7 +65,8 @@ class WalletControllerTest extends TestCase
 
     public function test_transfer_endpoint()
     {
-        $amount = 100;
+        $amount = 1.00;
+        $amountInCents = (int) round($amount * 100);
 
         $response = $this->actingAs($this->user)
             ->postJson('/wallet/transfer', [
@@ -75,27 +78,28 @@ class WalletControllerTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'balance' => 900
+            'balance' => 1000 - $amountInCents
         ]);
 
         $this->assertDatabaseHas('users', [
             'id' => $this->recipient->id,
-            'balance' => 600
+            'balance' => 500 + $amountInCents
         ]);
 
         $this->assertDatabaseHas('transactions', [
             'user_id' => $this->user->id,
             'type' => TransactionType::TRANSFER->value,
-            'amount' => $amount,
+            'amount' => $amountInCents,
             'recipient_id' => $this->recipient->id
         ]);
 
         $this->assertDatabaseHas('transactions', [
             'user_id' => $this->recipient->id,
             'type' => TransactionType::RECEIVED_TRANSFER->value,
-            'amount' => $amount
+            'amount' => $amountInCents
         ]);
     }
+
 
     public function test_transfer_with_insufficient_balance()
     {
